@@ -1,7 +1,7 @@
 //EnemyCharacter.cpp
 
 #include "EnemySpawner.h"
-
+#include "GameFramework/CharacterMovementComponent.h"
 #include "EnemyCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -20,36 +20,67 @@ void AEnemySpawner::BeginPlay()
 
 void AEnemySpawner::SpawnEnemies()
 {
-	if (!EnemyClass) return;
+	if (!EnemyClass || SpawnPoints.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("EnemySpawner missing EnemyClass or SpawnPoints"));
+		return;
+	}
 
 	AliveEnemies = NumberOfEnemies;
 	CurrentWave++;
 
 	for (int32 i = 0; i < NumberOfEnemies; i++)
 	{
-		FVector Origin = GetActorLocation();
-		FVector RandomPoint = UKismetMathLibrary::RandomUnitVector() * FMath::FRandRange(0.f, SpawnRadius);
-		FVector SpawnLocation = Origin + RandomPoint;
+		int32 RandomIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
+		AActor* SpawnPoint = SpawnPoints[RandomIndex];
 
-		FHitResult Hit;
+		if (!SpawnPoint) continue;
 
-		GetWorld()->LineTraceSingleByChannel(
-			Hit,
-			SpawnLocation + FVector(0,0,500),
-			SpawnLocation - FVector(0,0,500),
-			ECC_WorldStatic
+		FVector SpawnLocation = SpawnPoint->GetActorLocation();
+		FRotator SpawnRotation = SpawnPoint->GetActorRotation();
+
+		AActor* Enemy = GetWorld()->SpawnActor<AActor>(
+			EnemyClass,
+			SpawnLocation,
+			SpawnRotation
 		);
-
-		FVector FinalLocation = Hit.bBlockingHit ? Hit.ImpactPoint : SpawnLocation;
-
-		AActor* Enemy = GetWorld()->SpawnActor<AActor>(EnemyClass, FinalLocation, FRotator::ZeroRotator);
 
 		if (Enemy)
 		{
 			AEnemyCharacter* EnemyChar = Cast<AEnemyCharacter>(Enemy);
+
 			if (EnemyChar)
 			{
 				EnemyChar->SetSpawner(this);
+
+				float ZombieSpeed = 150.f; // normal speed
+
+				float Roll = FMath::FRand();
+
+				if (Roll <= 0.15f) // 15% chance for fast zombie
+				{
+					// FAST ZOMBIE
+					ZombieSpeed = 300.f;
+
+					EnemyChar->MaxHealth = 200.f;
+					EnemyChar->CurrentHealth = EnemyChar->MaxHealth;
+
+					UE_LOG(LogTemp, Warning, TEXT("FAST Zombie Spawned | Speed: %f | Health: %f"),
+						ZombieSpeed,
+						EnemyChar->MaxHealth);
+				}
+				else
+				{
+					// NORMAL ZOMBIE
+					EnemyChar->MaxHealth = 100.f;
+					EnemyChar->CurrentHealth = EnemyChar->MaxHealth;
+
+					UE_LOG(LogTemp, Warning, TEXT("Normal Zombie Spawned | Speed: %f | Health: %f"),
+						ZombieSpeed,
+						EnemyChar->MaxHealth);
+				}
+
+				EnemyChar->GetCharacterMovement()->MaxWalkSpeed = ZombieSpeed;
 			}
 		}
 	}
@@ -77,6 +108,6 @@ void AEnemySpawner::OnEnemyKilled(AActor* DeadEnemy)
 
 void AEnemySpawner::StartNextWave()
 {
-	NumberOfEnemies += 2; // optional difficulty scaling
+	NumberOfEnemies += 1; 
 	SpawnEnemies();
 }

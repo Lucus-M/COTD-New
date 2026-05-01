@@ -17,6 +17,7 @@ protected:
 
 public:
 	void SpawnEnemies();
+
 	UPROPERTY()
 	int32 AliveEnemies = 0;
 
@@ -26,15 +27,16 @@ public:
 	void OnEnemyKilled(AActor* DeadEnemy);
 
 	void StartNextWave();
-	// Enemy class to spawn (set in Blueprint)
-	UPROPERTY(EditAnywhere, Category="Spawning")
+
+	// Enemy class to spawn
+	UPROPERTY(EditAnywhere, Category = "Spawning")
 	TSubclassOf<AActor> EnemyClass;
 
-	// Number of enemies to spawn
-	UPROPERTY(EditAnywhere, Category="Spawning")
+	// Number of enemies per wave
+	UPROPERTY(EditAnywhere, Category = "Spawning")
 	int32 NumberOfEnemies = 10;
 
-	// Radius around spawner to spawn enemies
-	UPROPERTY(EditAnywhere, Category="Spawning")
-	float SpawnRadius = 1000.0f;
+	// Spawn points placed in the level
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	TArray<AActor*> SpawnPoints;
 };
