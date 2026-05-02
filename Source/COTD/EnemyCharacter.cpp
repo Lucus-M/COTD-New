@@ -5,7 +5,8 @@
 #include "AIController.h"
 #include "COTDCharacter.h"
 #include "Navigation/PathFollowingComponent.h"
-
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
 AEnemyCharacter::AEnemyCharacter()
 {
     PrimaryActorTick.bCanEverTick = true;
@@ -92,7 +93,16 @@ void AEnemyCharacter::TakeDamage(float DamageAmount)
         {
             SpawnerRef->OnEnemyKilled(this);
             UE_LOG(LogTemp, Warning, TEXT("Enemy died"));
+        }
 
+        if (DeathEffect)
+        {
+            UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+                GetWorld(),
+                DeathEffect,
+                GetActorLocation(),
+                GetActorRotation()
+            );
         }
 
         Destroy();

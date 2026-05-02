@@ -1,5 +1,3 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-//a
 #pragma once
 
 #include "CoreMinimal.h"
@@ -12,6 +10,7 @@ class USkeletalMeshComponent;
 class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
+class UUserWidget;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -20,40 +19,43 @@ UCLASS(config=Game)
 class ACOTDCharacter : public ACharacter
 {
 	GENERATED_BODY()
+	
 
-	/** Pawn mesh: 1st person view (arms; seen only by self) */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Mesh, meta = (AllowPrivateAccess = "true"))
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Mesh, meta=(AllowPrivateAccess="true"))
 	USkeletalMeshComponent* Mesh1P;
 
-	/** First person camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera, meta=(AllowPrivateAccess="true"))
 	UCameraComponent* FirstPersonCameraComponent;
 
-	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess="true"))
 	UInputMappingContext* DefaultMappingContext;
 
-	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess="true"))
 	UInputAction* JumpAction;
 
-	/** Move Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess="true"))
 	UInputAction* MoveAction;
 
-	/** Look Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess="true"))
+	UInputAction* LookAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess="true"))
+	UInputAction* DashAction;
+
 public:
 	ACOTDCharacter();
+	
+	UFUNCTION(BlueprintImplementableEvent, Category="Health")
+	void OnPlayerDamaged();
 
 protected:
-	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
-
-	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	void Dash();
+	void ResetDash();
+
 	UPROPERTY(EditAnywhere, Category="Combat")
 	float Damage = 10.0f;
 
@@ -65,32 +67,43 @@ protected:
 
 	float LastAttackTime = 0.0f;
 
-protected:
-	// APawn interface
+public:
 	virtual void NotifyControllerChanged() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
-	// End of APawn interface
 
-public:
-	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
-	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
-	/** Max health of the player */
+	// HEALTH
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health")
 	float MaxHealth = 100.0f;
 
-	/** Current health */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
 	float Health;
 
-	/** Apply damage to player */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
+	bool bIsDead = false;
+
 	UFUNCTION(BlueprintCallable, Category="Health")
 	void TakeDamage(float DamageAmount);
 
-	/** Check if player is dead */
 	UFUNCTION(BlueprintCallable, Category="Health")
 	bool IsDead() const;
-};
 
+	// DASH
+	UPROPERTY(EditAnywhere, Category="Movement")
+	float DashStrength = 3000.0f;
+
+	UPROPERTY(EditAnywhere, Category="Movement")
+	float DashCooldown = 1.0f;
+
+	bool bCanDash = true;
+
+	FTimerHandle DashTimerHandle;
+
+	// GAME OVER UI
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	TSubclassOf<UUserWidget> GameOverWidgetClass;
+
+	UUserWidget* GameOverWidget;
+};

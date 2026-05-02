@@ -8,6 +8,8 @@ public class COTD : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "AIModule", "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[] { "UMG",
+			"Slate",
+			"SlateCore","Niagara", "AIModule", "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
 	}
 }

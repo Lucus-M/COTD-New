@@ -39,4 +39,8 @@ public:
 	// Spawn points placed in the level
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 	TArray<AActor*> SpawnPoints;
+	
+	UPROPERTY(BlueprintReadOnly)
+	int32 TotalZombiesKilled = 0;
+
 };

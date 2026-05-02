@@ -88,7 +88,8 @@ void AEnemySpawner::SpawnEnemies()
 void AEnemySpawner::OnEnemyKilled(AActor* DeadEnemy)
 {
 	AliveEnemies--;
-
+	TotalZombiesKilled++;
+	
 	UE_LOG(LogTemp, Warning, TEXT("Enemy died. Alive enemies left: %d"), AliveEnemies);
 
 	if (AliveEnemies <= 0)

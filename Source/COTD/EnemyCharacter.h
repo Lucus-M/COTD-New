@@ -1,5 +1,6 @@
 #pragma once
-
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnemyCharacter.generated.h"
@@ -13,7 +14,9 @@ class COTD_API AEnemyCharacter : public ACharacter
 
 public:
     AEnemyCharacter();
-
+    UPROPERTY(EditDefaultsOnly, Category="Effects")
+    UNiagaraSystem* DeathEffect;
+    
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AI")
     float DetectionRange = 5000.0f;
 
