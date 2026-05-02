@@ -29,6 +29,9 @@ void AEnemySpawner::SpawnEnemies()
 	AliveEnemies = NumberOfEnemies;
 	CurrentWave++;
 
+	// -------------------------
+	// SPAWN ZOMBIES
+	// -------------------------
 	for (int32 i = 0; i < NumberOfEnemies; i++)
 	{
 		int32 RandomIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
@@ -53,35 +56,42 @@ void AEnemySpawner::SpawnEnemies()
 			{
 				EnemyChar->SetSpawner(this);
 
-				float ZombieSpeed = 150.f; // normal speed
-
+				float ZombieSpeed = 150.f;
 				float Roll = FMath::FRand();
 
-				if (Roll <= 0.15f) // 15% chance for fast zombie
+				if (Roll <= 0.15f)
 				{
-					// FAST ZOMBIE
 					ZombieSpeed = 300.f;
-
 					EnemyChar->MaxHealth = 200.f;
-					EnemyChar->CurrentHealth = EnemyChar->MaxHealth;
-
-					UE_LOG(LogTemp, Warning, TEXT("FAST Zombie Spawned | Speed: %f | Health: %f"),
-						ZombieSpeed,
-						EnemyChar->MaxHealth);
 				}
 				else
 				{
-					// NORMAL ZOMBIE
 					EnemyChar->MaxHealth = 100.f;
-					EnemyChar->CurrentHealth = EnemyChar->MaxHealth;
-
-					UE_LOG(LogTemp, Warning, TEXT("Normal Zombie Spawned | Speed: %f | Health: %f"),
-						ZombieSpeed,
-						EnemyChar->MaxHealth);
 				}
 
+				EnemyChar->CurrentHealth = EnemyChar->MaxHealth;
 				EnemyChar->GetCharacterMovement()->MaxWalkSpeed = ZombieSpeed;
 			}
+		}
+	}
+
+	// -------------------------
+	// SPAWN PICKUP (1 PER WAVE)
+	// -------------------------
+	if (bSpawnPickupPerWave && PickupClass && SpawnPoints.Num() > 0)
+	{
+		int32 PickupIndex = FMath::RandRange(0, HeartSpawnPoints.Num() - 1);
+		AActor* PickupSpawnPoint = HeartSpawnPoints[PickupIndex];
+
+		if (PickupSpawnPoint)
+		{
+			GetWorld()->SpawnActor<AActor>(
+				PickupClass,
+				PickupSpawnPoint->GetActorLocation(),
+				PickupSpawnPoint->GetActorRotation()
+			);
+
+			UE_LOG(LogTemp, Warning, TEXT("Pickup spawned this wave"));
 		}
 	}
 }

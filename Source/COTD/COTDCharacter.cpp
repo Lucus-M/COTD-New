@@ -141,3 +141,13 @@ bool ACOTDCharacter::IsDead() const
 {
 	return bIsDead;
 }
+
+void ACOTDCharacter::Heal(float HealAmount)
+{
+	if (bIsDead) return;
+
+	Health += HealAmount;
+	Health = FMath::Clamp(Health, 0.f, MaxHealth);
+
+	UE_LOG(LogTemplateCharacter, Warning, TEXT("Player Healed: %f | Current Health: %f"), HealAmount, Health);
+}

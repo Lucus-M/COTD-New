@@ -42,5 +42,13 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly)
 	int32 TotalZombiesKilled = 0;
+	
+	UPROPERTY(EditAnywhere, Category="Spawning")
+	TSubclassOf<AActor> PickupClass;
 
+	UPROPERTY(EditAnywhere, Category="Spawning")
+	bool bSpawnPickupPerWave = true;
+	
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+	TArray<AActor*> HeartSpawnPoints;
 };

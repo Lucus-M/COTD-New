@@ -106,4 +106,7 @@ public:
 	TSubclassOf<UUserWidget> GameOverWidgetClass;
 
 	UUserWidget* GameOverWidget;
+	
+	UFUNCTION(BlueprintCallable, Category="Health")
+	void Heal(float HealAmount);
 };
