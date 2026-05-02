@@ -34,6 +34,10 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
     float CurrentHealth = 100.f;
+    
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Health")
+    bool AttackingPlayer = false;
+
 
 protected:
     virtual void BeginPlay() override;
@@ -49,6 +53,7 @@ public:
 
     // Damage handling
     void TakeDamage(float DamageAmount);
+    
 
 private:
     bool bIsDead = false;

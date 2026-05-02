@@ -57,6 +57,8 @@ void AEnemyCharacter::Tick(float DeltaTime)
     // ATTACK PLAYER
     if (Distance <= AttackRange)
     {
+        AttackingPlayer = true;
+
         float CurrentTime = GetWorld()->GetTimeSeconds();
 
         if (CurrentTime - LastAttackTime >= AttackCooldown)
@@ -64,12 +66,15 @@ void AEnemyCharacter::Tick(float DeltaTime)
             LastAttackTime = CurrentTime;
 
             ACOTDCharacter* Player = Cast<ACOTDCharacter>(PlayerPawn);
-
             if (Player)
             {
                 Player->TakeDamage(Damage);
             }
         }
+    }
+    else
+    {
+        AttackingPlayer = false;
     }
 }
 
